@@ -1,0 +1,29 @@
+groups:
+- name: node_metrics
+  rules:
+  - alert: NodeLoad
+    expr: node_load15 < 1
+    for: 2m
+    labels:
+      severity: normal
+    annotations:
+      summary: "{{$labels.instance}}: Low node load detected"
+      description: "{{$labels.instance}}: node load is below 1 (current value is: {{ $value }}"
+  - alert: NodeMemoryUsage
+    expr: (node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes)) / node_memory_MemTotal_bytes * 100 > 30
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "{{$labels.instance}}: High Memory usage detected"
+      description: "{{$labels.instance}}: Memory usage is above 40% (current value is: {{ $value }}"
+- name: targets_status
+  rules:
+  - alert: TargetStatus
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "{{$labels.instance}}: prometheus target down"
+      description: "{{$labels.instance}}: prometheus target down，job is {{$labels.job}}"
